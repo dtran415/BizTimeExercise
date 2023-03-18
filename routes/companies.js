@@ -7,7 +7,7 @@ let router = new express.Router()
 router.get("/", async (req, res, next) => {
 
     try {
-        const result = await db.query('SELECT code, name, description FROM companies')
+        const result = await db.query('SELECT code, name FROM companies')
         return res.json({"companies": result.rows})
     } catch (e) {
         next(e)
@@ -48,6 +48,9 @@ router.put("/:code", async (req, res, next) => {
     try {
         const code = req.params.code
         const {name, description} = req.body
+
+        if (!name || !description)
+            throw new ExpressError("name, description required", 400)
 
         const result = await db.query(`UPDATE companies SET name=$1, description=$2 WHERE code=$3 RETURNING code, name, description`, [name, description, code])
 

@@ -60,13 +60,13 @@ router.put("/:id(\\d+)", async (req, res, next) => {
         const {id} = req.params
         const {amt} = req.body
 
-        if (amt <= 0)
+        if (!amt || amt <= 0)
             throw new ExpressError("amt must be greater than 0", 400)
 
         const result = await db.query(`UPDATE invoices SET amt=$1 WHERE id=$2 RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, id])
 
         if (result.rows.length == 0)
-            throw new ExpressError(`Invalid ID: ${id}`, 400)
+            throw new ExpressError(`Invalid ID: ${id}`, 404)
 
         const {...invoice} = result.rows[0]
         return res.json({invoice})
