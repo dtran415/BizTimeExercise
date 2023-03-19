@@ -43,7 +43,8 @@ describe("GET /companies/:code", function() {
             "company": {
                     "code": "apple",
                     "name": "Apple",
-                    "description": "Maker of OSX."
+                    "description": "Maker of OSX.",
+                    "industries": ["tech"]
                 }
         });
     })
@@ -57,32 +58,21 @@ describe("GET /companies/:code", function() {
 describe("POST /companies", function() {
     it("should create a new company with valid input", async function() {
         const company = {
-            code: "abc",
             name: "ABC Company",
             description: "The ABC Company"
         }
         let response = await request(app).post("/companies").send(company);
         expect(response.statusCode).toBe(201);
         expect(response.body).toEqual({
-            company: company
+            company: {code:"abc-company", ...company}
         })
 
         response = await request(app).get("/companies");
         expect(response.body.companies.length).toBe(3);
     })
 
-    it("should return 400 for missing code", async function() {
-        const company = {
-            name: "ABC Company",
-            description: "The ABC Company"
-        }
-        const response = await request(app).post("/companies").send(company);
-        expect(response.statusCode).toBe(400);
-    })
-
     it("should return 400 for missing name", async function() {
         const company = {
-            code: "abc",
             description: "The ABC Company"
         }
         const response = await request(app).post("/companies").send(company);
@@ -91,7 +81,6 @@ describe("POST /companies", function() {
 
     it("should return 400 for missing description", async function() {
         const company = {
-            code: "abc",
             name: "ABC Company",
         }
         const response = await request(app).post("/companies").send(company);
